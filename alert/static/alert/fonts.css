@@ -1,0 +1,13 @@
+/* nanum-gothic-regular - korean_latin */
+@font-face {
+  font-family: 'Nanum Gothic';
+  font-style: normal;
+  font-weight: 400;
+  src: url('fonts/nanum-gothic-v11-korean_latin-regular.eot'); /* IE9 Compat Modes */
+  src: local('NanumGothic'),
+       url('fonts/nanum-gothic-v11-korean_latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('fonts/nanum-gothic-v11-korean_latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+       url('fonts/nanum-gothic-v11-korean_latin-regular.woff') format('woff'), /* Modern Browsers */
+       url('fonts/nanum-gothic-v11-korean_latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('fonts/nanum-gothic-v11-korean_latin-regular.svg#NanumGothic') format('svg'); /* Legacy iOS */
+}
