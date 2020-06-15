@@ -81,45 +81,43 @@ def scraping(request, page_id):
 	#options.add_argument('headless')
 	
 	driver = webdriver.Chrome(executable_path='alert/chromedriver.exe', chrome_options=options)
-
-	url = "http://www.dongguk.edu/mbs/kr/jsp/board/list.jsp?boardId=3662&search=&column=&mcategoryId=0&boardType=01&listType=01&command=list&id=kr_010804000000&spage=" + str(page_id)
-
-	print("# 페이지 로딩")
-	driver.get(url)
-	driver.implicitly_wait(2)
-
-	print("# 페이지 파싱 시작")
-	html = driver.page_source
-	soup = BeautifulSoup(html, 'html.parser')
-
-	print("# 데이터 테이블 만들기")
-	all_board = soup.find('table', {'id' : 'board_list'})
-
-	trs = all_board.tbody.find_all('tr')
-
-	print("# 목록 크롤링 시작")
-
 	idx = []
 	link = []
 	user = []
 	date = []
+	for page_id in range(1,6):
+		url = "http://www.dongguk.edu/mbs/kr/jsp/board/list.jsp?boardId=3662&search=&column=&mcategoryId=0&boardType=01&listType=01&command=list&id=kr_010804000000&spage=" + str(page_id)
+		print("# 페이지 로딩")
+		driver.get(url)
+		driver.implicitly_wait(2)
 
-	for tr in trs[0:len(trs)]:
-		tds = tr.find_all('td')
-		id = tds[0].string
-		if id == None:
-			continue
-		else:
-			idx.append(id)
-		
-		tmp = tds[1].find('a', href = True)
-		
-		#링크이용해 게시글 내부로 이동
-		link.append('http://www.dongguk.edu/mbs/kr/jsp/board/' + tmp['href'])
-		
-		user.append(tds[2].string.strip())
-		date.append(tds[3].string.strip())
-		
+		print("# 페이지 파싱 시작")
+		html = driver.page_source
+		soup = BeautifulSoup(html, 'html.parser')
+
+		print("# 데이터 테이블 만들기")
+		all_board = soup.find('table', {'id' : 'board_list'})
+
+		trs = all_board.tbody.find_all('tr')
+
+		print("# 목록 크롤링 시작")
+
+		for tr in trs[0:len(trs)]:
+			tds = tr.find_all('td')
+			id = tds[0].string
+			if id == None:
+				continue
+			else:
+				idx.append(id)
+			
+			tmp = tds[1].find('a', href = True)
+			
+			#링크이용해 게시글 내부로 이동
+			link.append('http://www.dongguk.edu/mbs/kr/jsp/board/' + tmp['href'])
+			
+			user.append(tds[2].string.strip())
+			date.append(tds[3].string.strip())
+				
 	print("# 목록 크롤링 완료")
 
 	print("# 글 내용 크롤링 시작")
@@ -236,13 +234,15 @@ def kakao(request):
 
 		print("# 3. 장학금알림봇 관리 페이지")
 		driver.find_element_by_xpath('//*[@id="mArticle"]/div[2]/div/div[2]/table/tbody/tr/td[5]/button').click()
+		driver.implicitly_wait(30)
 
 		if post_number == 1:
+			print("# 4. post1번 실험")
 			driver.find_element_by_xpath('//*[@id="mArticle"]/div[2]/ul/li[1]/button').click()
 
 		else:
+			print("# 4. post2번 실험")
 			driver.find_element_by_xpath('//*[@id="mArticle"]/div[2]/ul/li[3]/button').click()
-
 		driver.implicitly_wait(2)
 
 		# post_number = 1 >> 기본 텍스트형 작성
