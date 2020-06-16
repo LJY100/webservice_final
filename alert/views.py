@@ -215,201 +215,201 @@ def kakao(request):
 	post_number = Board.objects.filter(board_alert = False).count()
 	post_howmuch = 1
 
-	while post_number != 0:
+	#while post_number != 0:
+	#아래 #6 전까지 들여쓰기 해야함
+	post_num = post_number//3
+	post_ber = post_number%3
 
-		post_num = post_number//3
-		post_ber = post_number%3
+	print("# 1. 관리자 로그인 페이지 로딩")
+	driver.get(url)
+	driver.implicitly_wait(2)
 
-		print("# 1. 관리자 로그인 페이지 로딩")
-		driver.get(url)
+	print("# 2. 로그인 실행")
+	driver.find_element_by_id('id_email_2').send_keys(kakao_admin_id)
+	driver.find_element_by_id('id_password_3').send_keys(kakao_admin_pw)
+
+	driver.find_element_by_xpath('//*[@id="login-form"]/fieldset/div[8]/button[1]').click()
+	driver.implicitly_wait(3)
+
+	print("# 3. 장학금알림봇 관리 페이지")
+	driver.find_element_by_xpath('//*[@id="mArticle"]/div[2]/div/div[2]/table/tbody/tr/td[5]/button').click()
+	driver.implicitly_wait(3)
+
+	if post_number == 1:
+		print("# 4. post1번 실험")
+		driver.find_element_by_xpath('//*[@id="mArticle"]/div[2]/ul/li[1]/button').click()
+
+	else:
+		print("# 4. post2번 실험")
+		driver.get(url_1)
+	driver.implicitly_wait(2)
+
+	# post_number = 1 >> 기본 텍스트형 작성
+	# post_number = 2, 3 >> 와이드 리스트형 작성
+
+	#############################################################
+
+	print("# 4. 사전 정보 편집")
+
+	# board_id, board_title, board_url, board_text, board_date, board_alert
+	bQ = Board.objects.filter(board_alert = False).order_by('board_id').first()
+
+	if today.strftime('%p') == "AM":
+		when = " 아침"
+	else:
+		when = " 저녁"
+
+	post_title = '{d.month}월 {d.day}일'.format(d=today) + str(when) + " 장학공지 " + str(post_howmuch) + "차 알림"
+
+	print(post_title)
+	#테스트용
+	
+	###########################################################
+	if post_number == 1:
+		post_text = post_title + "\n\n▶ " + bQ.board_title
+	# 이부분은 공지가 1개일때 텍스트로 안내하기위해 필요한 부분
+	##########################################################        
+
+	print("# 5-1. 정보 웹페이지에 입력")
+	if post_number == 1:
+		# 우선은 공지 1개인 경우부터 / IF문으로 경우 나누기
+		driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[2]/div[1]/div[2]/label/span').click()
+		driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[2]/div[2]/div[2]/input').send_keys("C:/information/post_image"+str(random.randrange(1,8))+".jpg")
+		# 이미지 경로 수정 필요
+
+		driver.find_element_by_xpath('//*[@id="messageWrite"]').send_keys(post_text)
+
+		driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[4]/div/div[4]/label/span').click()
+		driver.find_element_by_xpath('//*[@id="btnName"]').send_keys("장학공지로 이동")
+		driver.find_element_by_xpath('//*[@id="linkUpload"]').send_keys(bQ.board_url.strip('http://'))
+
+		driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[2]/span/button[2]').click()
 		driver.implicitly_wait(2)
 
-		print("# 2. 로그인 실행")
-		driver.find_element_by_id('id_email_2').send_keys(kakao_admin_id)
-		driver.find_element_by_id('id_password_3').send_keys(kakao_admin_pw)
+		post_ber = 0
+		# 마지막에 num >= 1 인경우에만 리스트 3개씩 발송하게끔 작성하고 코드 끝부분에 num -= 1,
+		# 그외에 num == 0 인 경우에는 리스느 1개, 2개 발송가능하게끔 중간에 IF문으로 발송하게 작성하고 코드 끝부분에 ber == 0
 
-		driver.find_element_by_xpath('//*[@id="login-form"]/fieldset/div[8]/button[1]').click()
-		driver.implicitly_wait(3)
+		bQ_id = bQ.board_id
+		Board.objects.filter(board_id = bQ_id).update(board_alert = True)
+		### Board.objects,~~.first() 의 board_alert => True로 전환
 
-		print("# 3. 장학금알림봇 관리 페이지")
-		driver.find_element_by_xpath('//*[@id="mArticle"]/div[2]/div/div[2]/table/tbody/tr/td[5]/button').click()
-		driver.implicitly_wait(3)
+	else:
+		post_random = random.sample(range(1,4), 3)
 
-		if post_number == 1:
-			print("# 4. post1번 실험")
-			driver.find_element_by_xpath('//*[@id="mArticle"]/div[2]/ul/li[1]/button').click()
+		if post_num >= 1:
+			# 포스팅 3개인 경우 하여튼 역순으로 작성함
+			driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[3]/button/span').click()
+			# 리스트 추가 & 리스트항목 4 작성
 
-		else:
-			print("# 4. post2번 실험")
-			driver.get(url_1)
-		driver.implicitly_wait(2)
+			driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[3]/div[4]/dl/dd[1]/div[2]/div[2]/input').send_keys("C:/information/item_image"+str(post_random[0])+".jpg")
+			driver.find_element_by_name('items[3].text').send_keys(titling(bQ.board_title))
+			driver.implicitly_wait(1)
 
-		# post_number = 1 >> 기본 텍스트형 작성
-		# post_number = 2, 3 >> 와이드 리스트형 작성
-
-		#############################################################
-
-		print("# 4. 사전 정보 편집")
-
-		# board_id, board_title, board_url, board_text, board_date, board_alert
-		bQ = Board.objects.filter(board_alert = False).order_by('board_id').first()
-
-		if today.strftime('%p') == "AM":
-			when = " 아침"
-		else:
-			when = " 저녁"
-
-		post_title = '{d.month}월 {d.day}일'.format(d=today) + str(when) + " 장학공지 " + str(post_howmuch) + "차 알림"
-
-		print(post_title)
-		#테스트용
-		
-		###########################################################
-		if post_number == 1:
-			post_text = post_title + "\n\n▶ " + bQ.board_title
-		# 이부분은 공지가 1개일때 텍스트로 안내하기위해 필요한 부분
-		##########################################################        
-
-		print("# 5-1. 정보 웹페이지에 입력")
-		if post_number == 1:
-			# 우선은 공지 1개인 경우부터 / IF문으로 경우 나누기
-			driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[2]/div[1]/div[2]/label/span').click()
-			driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[2]/div[2]/div[2]/input').send_keys("C:/information/post_image"+str(random.randrange(1,8))+".jpg")
-			# 이미지 경로 수정 필요
-
-			driver.find_element_by_xpath('//*[@id="messageWrite"]').send_keys(post_text)
-
-			driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[4]/div/div[4]/label/span').click()
-			driver.find_element_by_xpath('//*[@id="btnName"]').send_keys("장학공지로 이동")
-			driver.find_element_by_xpath('//*[@id="linkUpload"]').send_keys(bQ.board_url.strip('http://'))
-
-			driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[2]/span/button[2]').click()
+			driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[3]/div[4]/dl/dd[3]/div[1]/div[3]/label/span').click()
+			driver.implicitly_wait(1)
+			driver.find_element_by_name('items[3].link.url').send_keys(bQ.board_url.strip('http://'))
 			driver.implicitly_wait(2)
 
-			post_ber = 0
+			post_num -= 1
 			# 마지막에 num >= 1 인경우에만 리스트 3개씩 발송하게끔 작성하고 코드 끝부분에 num -= 1,
 			# 그외에 num == 0 인 경우에는 리스느 1개, 2개 발송가능하게끔 중간에 IF문으로 발송하게 작성하고 코드 끝부분에 ber == 0
 
 			bQ_id = bQ.board_id
-			Board.objects.filter(board_id = bQ_id).update(board_alert = True)
-			### Board.objects,~~.first() 의 board_alert => True로 전환
-
-		else:
-			post_random = random.sample(range(1,4), 3)
-
-			if post_num >= 1:
-				# 포스팅 3개인 경우 하여튼 역순으로 작성함
-				driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[3]/button/span').click()
-				# 리스트 추가 & 리스트항목 4 작성
-
-				driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[3]/div[4]/dl/dd[1]/div[2]/div[2]/input').send_keys("C:/information/item_image"+str(post_random[0])+".jpg")
-				driver.find_element_by_name('items[3].text').send_keys(titling(bQ.board_title))
-				driver.implicitly_wait(1)
-
-				driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[3]/div[4]/dl/dd[3]/div[1]/div[3]/label/span').click()
-				driver.implicitly_wait(1)
-				driver.find_element_by_name('items[3].link.url').send_keys(bQ.board_url.strip('http://'))
-				driver.implicitly_wait(2)
-
-				post_num -= 1
-				# 마지막에 num >= 1 인경우에만 리스트 3개씩 발송하게끔 작성하고 코드 끝부분에 num -= 1,
-				# 그외에 num == 0 인 경우에는 리스느 1개, 2개 발송가능하게끔 중간에 IF문으로 발송하게 작성하고 코드 끝부분에 ber == 0
-
-				bQ_id = bQ.board_id
-				Board.objects.filter(board_id = bQ_id).update(board_alert = True)         
-				bQ = Board.objects.filter(board_alert = False).order_by('board_id').first()
-				### Board.objects,~~.first() 의 board_alert => True로 전환
-				
-			else:
-				post_ber = 0
-				# 마지막에 num >= 1 인경우에만 리스트 3개씩 발송하게끔 작성하고 코드 끝부분에 num -= 1,
-				# 그외에 num == 0 인 경우에는 리스느 1개, 2개 발송가능하게끔 중간에 IF문으로 발송하게 작성하고 코드 끝부분에 ber == 0
-					
-
-			# 리스트 항목 3 작성
-			driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[3]/div[3]/dl/dd[1]/div[2]/div[2]/input').send_keys("C:/information/item_image"+str(post_random[1])+".jpg")
-			driver.find_element_by_name('items[2].text').send_keys(titling(bQ.board_title))
-			driver.implicitly_wait(1)
-
-			driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[3]/div[3]/dl/dd[3]/div[1]/div[3]/label/span').click()
-			driver.implicitly_wait(1)
-			driver.find_element_by_name('items[2].link.url').send_keys(bQ.board_url.strip('http://'))
-			driver.implicitly_wait(2)
-			
-			bQ_id = bQ.board_id
-			Board.objects.filter(board_id = bQ_id).update(board_alert = True)          
+			Board.objects.filter(board_id = bQ_id).update(board_alert = True)         
 			bQ = Board.objects.filter(board_alert = False).order_by('board_id').first()
 			### Board.objects,~~.first() 의 board_alert => True로 전환
+			
+		else:
+			post_ber = 0
+			# 마지막에 num >= 1 인경우에만 리스트 3개씩 발송하게끔 작성하고 코드 끝부분에 num -= 1,
+			# 그외에 num == 0 인 경우에는 리스느 1개, 2개 발송가능하게끔 중간에 IF문으로 발송하게 작성하고 코드 끝부분에 ber == 0
+				
 
-
-			# 리스트 항목 2 작성
-			driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[3]/div[2]/dl/dd[1]/div[2]/div[2]/input').send_keys("C:/information/item_image"+str(post_random[2])+".jpg")
-			driver.find_element_by_name('items[1].text').send_keys(titling(bQ.board_title))
-			driver.implicitly_wait(1)
-
-			driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[3]/div[2]/dl/dd[3]/div[1]/div[3]/label/span').click()
-			driver.implicitly_wait(1)
-			driver.find_element_by_name('items[1].link.url').send_keys(bQ.board_url.strip('http://'))
-			driver.implicitly_wait(2)
-
-
-			# 리스트 항목 2를 그대로 이용해 리스트 항목 1작성
-			driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[3]/div[1]/dl/dd[1]/div[2]/div[2]/input').send_keys("C:/information/post_image"+str(random.randrange(1,4))+".jpg")
-			driver.find_element_by_name('items[0].text').send_keys(titling(bQ.board_title))
-			driver.implicitly_wait(1)
-
-			driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[3]/div[1]/dl/dd[3]/div[1]/div[3]/label/span').click()
-			driver.implicitly_wait(1)
-			driver.find_element_by_name('items[0].link.url').send_keys(bQ.board_url.strip('http://'))
-			driver.implicitly_wait(2)
-
-			bQ_id = bQ.board_id
-			Board.objects.filter(board_id = bQ_id).update(board_alert = True)
-			### Board.objects,~~.first() 의 board_alert => True로 전환
-
-			# 제목 입력
-			driver.find_element_by_id('listTitle').send_keys(post_title)
-			driver.implicitly_wait(1)
-
-			# 공유하기 버튼
-			#driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[5]/div/div[2]/label/span').click()
-
-			#driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[2]/span/button[2]').click()
-			#driver.implicitly_wait(2)
-
-
-		print("# 5-2. 2페이지 입력")
-		driver.execute_script("window.scrollTo(0, 0)") 
-
-		action = ActionChains(driver)
+		# 리스트 항목 3 작성
+		driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[3]/div[3]/dl/dd[1]/div[2]/div[2]/input').send_keys("C:/information/item_image"+str(post_random[1])+".jpg")
+		driver.find_element_by_name('items[2].text').send_keys(titling(bQ.board_title))
 		driver.implicitly_wait(1)
 
-		###########
-		#RadiointoSpan = driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div/div[2]/div/label/span/span')
-		#driver.implicitly_wait(1)
-		#RadiointoSpan.click()
-		#firstLevelMenu = driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div/div[2]/div[2]')
-		#action.move_to_element(firstLevelMenu).perform()
-		#driver.implicitly_wait(1)
-		#secondLevelMenu = driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div/div[2]/div[2]/div[2]/ul/li/div/label/span').click()
-		###### PICK! 1. 그룹지정 발송
-
-		###########
-		driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[1]/div[2]/div[1]/div[2]/div/label/span/span').click()
+		driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[3]/div[3]/dl/dd[3]/div[1]/div[3]/label/span').click()
 		driver.implicitly_wait(1)
-		driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div/div/div[2]/div/div/input').send_keys("300")
-		###### PICK! 2. 전체 발송 (밑에 내려가서 새로등록한 친구 등록)
-
-		driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[2]/button[4]').click()
+		driver.find_element_by_name('items[2].link.url').send_keys(bQ.board_url.strip('http://'))
 		driver.implicitly_wait(2)
-		driver.find_element_by_xpath('/html/body/div[3]/div[2]/div/div/div[2]/button[2]').click()
-		driver.implicitly_wait(3)
+		
+		bQ_id = bQ.board_id
+		Board.objects.filter(board_id = bQ_id).update(board_alert = True)          
+		bQ = Board.objects.filter(board_alert = False).order_by('board_id').first()
+		### Board.objects,~~.first() 의 board_alert => True로 전환
 
-		print("# 5-3. 발송예약 완료")
 
-		post_number = post_num*3 + post_ber
-		post_howmuch += 1
-		print("post_num : ", post_num, ", post_ber : ", post_ber)
+		# 리스트 항목 2 작성
+		driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[3]/div[2]/dl/dd[1]/div[2]/div[2]/input').send_keys("C:/information/item_image"+str(post_random[2])+".jpg")
+		driver.find_element_by_name('items[1].text').send_keys(titling(bQ.board_title))
+		driver.implicitly_wait(1)
+
+		driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[3]/div[2]/dl/dd[3]/div[1]/div[3]/label/span').click()
+		driver.implicitly_wait(1)
+		driver.find_element_by_name('items[1].link.url').send_keys(bQ.board_url.strip('http://'))
+		driver.implicitly_wait(2)
+
+
+		# 리스트 항목 2를 그대로 이용해 리스트 항목 1작성
+		driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[3]/div[1]/dl/dd[1]/div[2]/div[2]/input').send_keys("C:/information/post_image"+str(random.randrange(1,4))+".jpg")
+		driver.find_element_by_name('items[0].text').send_keys(titling(bQ.board_title))
+		driver.implicitly_wait(1)
+
+		driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[3]/div[1]/dl/dd[3]/div[1]/div[3]/label/span').click()
+		driver.implicitly_wait(1)
+		driver.find_element_by_name('items[0].link.url').send_keys(bQ.board_url.strip('http://'))
+		driver.implicitly_wait(2)
+
+		bQ_id = bQ.board_id
+		Board.objects.filter(board_id = bQ_id).update(board_alert = True)
+		### Board.objects,~~.first() 의 board_alert => True로 전환
+
+		# 제목 입력
+		driver.find_element_by_id('listTitle').send_keys(post_title)
+		driver.implicitly_wait(1)
+
+		# 공유하기 버튼
+		#driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[5]/div/div[2]/label/span').click()
+
+		driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[2]/span/div/button[2]').click()
+		driver.implicitly_wait(2)
+
+
+	print("# 5-2. 2페이지 입력")
+	driver.execute_script("window.scrollTo(0, 0)") 
+
+	action = ActionChains(driver)
+	driver.implicitly_wait(1)
+
+	###########
+	#RadiointoSpan = driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div/div[2]/div/label/span/span')
+	#driver.implicitly_wait(1)
+	#RadiointoSpan.click()
+	#firstLevelMenu = driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div/div[2]/div[2]')
+	#action.move_to_element(firstLevelMenu).perform()
+	#driver.implicitly_wait(1)
+	#secondLevelMenu = driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div/div[2]/div[2]/div[2]/ul/li/div/label/span').click()
+	###### PICK! 1. 그룹지정 발송
+
+	###########
+	driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[1]/div[2]/div[1]/div[2]/div/label/span/span').click()
+	driver.implicitly_wait(1)
+	driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div/div/div[2]/div/div/input').send_keys("300")
+	###### PICK! 2. 전체 발송 (밑에 내려가서 새로등록한 친구 등록)
+
+	driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[2]/button[4]').click()
+	driver.implicitly_wait(2)
+	driver.find_element_by_xpath('/html/body/div[3]/div[2]/div/div/div[2]/button[2]').click()
+	driver.implicitly_wait(3)
+
+	print("# 5-3. 발송예약 완료")
+
+	post_number = post_num*3 + post_ber
+	post_howmuch += 1
+	print("post_num : ", post_num, ", post_ber : ", post_ber)
 
 	print("# 6. 웹드라이버 종료")
 	driver.close()
