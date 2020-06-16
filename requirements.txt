@@ -1,3 +1,4 @@
+views.py파일 218라인 주석처리 >> 캐시가 너무 많이 소진됨 1회만 보내도록 변경
 asn1crypto==0.24.0
 beautifulsoup4==4.6.3
 certifi==2018.8.24
