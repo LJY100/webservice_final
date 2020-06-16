@@ -19,6 +19,7 @@ from .forms import UnknownForm
 from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
 from bs4 import BeautifulSoup
+from selenium.common.exceptions import NoSuchElementException
 import re
 import random
 #pip install selenium
@@ -182,10 +183,8 @@ def scraping(request, page_id):
 	print("#### 장학공지 총 ", v0, "건")
 	print("################################")
 
-	if page_id == 1:
-		return HttpResponse("<script>window.open('','_parent','');window.close();window.opener.location.reload();</script>")
-	else:
-		return redirect(reverse('index'))
+
+	return redirect(reverse('index'))
 	
 
 def kakao(request):
@@ -212,7 +211,7 @@ def kakao(request):
 	driver = webdriver.Chrome(executable_path='alert/chromedriver.exe', chrome_options=options)
 
 	url = 'https://accounts.kakao.com/login?continue=https://center-pf.kakao.com/signup'
-
+	url_1 = 'https://center-pf.kakao.com/_xaEAcxb/messages/new/widelist'
 	post_number = Board.objects.filter(board_alert = False).count()
 	post_howmuch = 1
 
@@ -234,7 +233,7 @@ def kakao(request):
 
 		print("# 3. 장학금알림봇 관리 페이지")
 		driver.find_element_by_xpath('//*[@id="mArticle"]/div[2]/div/div[2]/table/tbody/tr/td[5]/button').click()
-		driver.implicitly_wait(30)
+		driver.implicitly_wait(3)
 
 		if post_number == 1:
 			print("# 4. post1번 실험")
@@ -242,7 +241,7 @@ def kakao(request):
 
 		else:
 			print("# 4. post2번 실험")
-			driver.find_element_by_xpath('//*[@id="mArticle"]/div[2]/ul/li[3]/button').click()
+			driver.get(url_1)
 		driver.implicitly_wait(2)
 
 		# post_number = 1 >> 기본 텍스트형 작성
@@ -296,7 +295,7 @@ def kakao(request):
 			### Board.objects,~~.first() 의 board_alert => True로 전환
 
 		else:
-			post_random = random.sample(range(1,8), 3)
+			post_random = random.sample(range(1,4), 3)
 
 			if post_num >= 1:
 				# 포스팅 3개인 경우 하여튼 역순으로 작성함
@@ -355,7 +354,7 @@ def kakao(request):
 
 
 			# 리스트 항목 2를 그대로 이용해 리스트 항목 1작성
-			driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[3]/div[1]/dl/dd[1]/div[2]/div[2]/input').send_keys("C:/information/post_image"+str(random.randrange(1,8))+".jpg")
+			driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[3]/div[1]/dl/dd[1]/div[2]/div[2]/input').send_keys("C:/information/post_image"+str(random.randrange(1,4))+".jpg")
 			driver.find_element_by_name('items[0].text').send_keys(titling(bQ.board_title))
 			driver.implicitly_wait(1)
 
@@ -373,10 +372,10 @@ def kakao(request):
 			driver.implicitly_wait(1)
 
 			# 공유하기 버튼
-			driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[5]/div/div[2]/label/span').click()
+			#driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[1]/div[1]/div[5]/div/div[2]/label/span').click()
 
-			driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[2]/span/button[2]').click()
-			driver.implicitly_wait(2)
+			#driver.find_element_by_xpath('//*[@id="mArticle"]/div/form/div[2]/span/button[2]').click()
+			#driver.implicitly_wait(2)
 
 
 		print("# 5-2. 2페이지 입력")
