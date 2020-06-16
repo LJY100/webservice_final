@@ -47,6 +47,7 @@ def index(request):
 
 
 def detail(request, b_id): 
+	print("detail 확인용")
 	board_list = get_object_or_404(Board, board_id = b_id)
 	context = {
 		'board_text': board_list.board_text
@@ -196,7 +197,7 @@ def kakao(request):
 
 	#카카오 플러스친구 관리자 계정 정보 #######################################
 	kakao_admin_id = "ljyjh0117@naver.com"
-	kakao_admin_pw = "dydrkfl7"
+	kakao_admin_pw = ""
 	#########################################################################
 
 	today = timezone.now()
@@ -255,9 +256,9 @@ def kakao(request):
 	bQ = Board.objects.filter(board_alert = False).order_by('board_id').first()
 
 	if today.strftime('%p') == "AM":
-		when = " 아침"
+		when = " 오전"
 	else:
-		when = " 저녁"
+		when = " 오후"
 
 	post_title = '{d.month}월 {d.day}일'.format(d=today) + str(when) + " 장학공지 " + str(post_howmuch) + "차 알림"
 
